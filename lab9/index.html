@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="uk>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гра 21</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: lavenderblush;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #db7093;
+        }
+        .game {
+            max-width: 650px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #c9b4dc;
+        }
+        .players {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        .player {
+            width: 45%;
+        }
+        .score {
+            background: pink;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 22px;
+        }
+        .card {
+            width: 130px;
+            height: 180px;
+            margin: 15px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px #aaa;
+        }
+        button {
+            background: lightblue;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #16a34a;
+        }
+        button:disabled {
+            background: gray;
+            cursor: not-allowed;
+        }
+        #result {
+            font-size: 20px;
+            font-weight: bold;
+            color: #db7093;
+            margin-top: 20px;
+        }
+        #round {
+            color: #555;
+            font-size: 18px;
+        }
+        @media (max-width: 450px) {
+            .game {
+                padding: 12px;
+            }
+            .card {
+                width: 100px;
+                height: 145px;
+            }
+            .score {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="game">
+    <h1>Гра «21»</h1>
+    <div class="players">
+        <div class="player">
+            <h2 id="userName">Гравець</h2>
+            <div class="score" id="userScore">0</div>
+            <div class="card">
+                <img id="userCard"src="https://deckofcardsapi.com/static/img/back.png"alt="Карта гравця">
+            </div>
+        </div>
+        <div class="player"> <h2>Комп'ютер</h2>
+            <div class="score" id="compScore">0</div>
+            <div class="card">
+                <img id="compCard" src="https://deckofcardsapi.com/static/img/back.png" alt="Карта комп'ютера">
+            </div>
+        </div>
+    </div>
+    <p id="round">Раунд 1 з 3</p>
+    <button id="btn" onclick="play()">Generate</button>
+    <p id="result">Натисніть кнопку, щоб почати гру!</p>
+</div>
+<script>
+    let name = prompt("Введіть ім'я:");
+    while (name !== null && name.trim() === "") {
+        name = prompt("Ім'я не може бути порожнім. Введіть ім'я:");
+    }
+    document.getElementById("userName").textContent = name;
+    const cards = [
+        { name: "6", value: 6, code: "6" },
+        { name: "7", value: 7, code: "7" },
+        { name: "8", value: 8, code: "8" },
+        { name: "9", value: 9, code: "9" },
+        { name: "10", value: 10, code: "0" },
+        { name: "Валет", value: 2, code: "J" },
+        { name: "Дама", value: 3, code: "Q" },
+        { name: "Король", value: 4, code: "K" },
+        { name: "Туз", value: 11, code: "A" }];
+    const suits = ["S", "H", "D", "C"];
+    let userTotal = 0, compTotal = 0, round = 0;
+    function randomCard() {
+        let card = cards[Math.floor(Math.random() * cards.length)];
+        let suit = suits[Math.floor(Math.random() * suits.length)];
+        return {
+            name: card.name, value: card.value,
+            image: "https://deckofcardsapi.com/static/img/" +
+                   card.code + suit + ".png"
+        };
+    }
+    function play() {
+        const user = randomCard();
+        const comp = randomCard();
+        userTotal += user.value;
+        compTotal += comp.value;
+        round++;
+        document.getElementById("userCard").src = user.image;
+        document.getElementById("compCard").src = comp.image;
+        document.getElementById("userScore").textContent = userTotal;
+        document.getElementById("compScore").textContent = compTotal;
+        document.getElementById("round").textContent = round < 3 ? "Раунд " + (round + 1) + " з 3" : "Гру завершено";
+        document.getElementById("result").textContent ="Ви отримали: " + user.value + " Комп'ютер отримав: " + comp.value;
+        if (user.value > comp.value) {
+            document.getElementById("userCard").style.border = "3px solid green";
+            document.getElementById("compCard").style.border = "none";
+        } else if (comp.value > user.value) {
+            document.getElementById("compCard").style.border = "3px solid green";
+            document.getElementById("userCard").style.border = "none";
+        } else {
+            document.getElementById("userCard").style.border = "3px solid orange";
+            document.getElementById("compCard").style.border = "3px solid orange";
+        }
+        if (round === 3) {
+            document.getElementById("btn").disabled = true;
+            let message;
+            if (userTotal > compTotal) {
+                message = "Перемогла" + name ;
+            } else if (userTotal < compTotal) {
+                message = "Переміг комп'ютер";
+            } else {
+                message = "Нічия";
+            }
+            document.getElementById("result").textContent = message + " Рахунок: " + userTotal + " : " + compTotal;
+        }
+    }
+</script>
+</body>
+</html>
