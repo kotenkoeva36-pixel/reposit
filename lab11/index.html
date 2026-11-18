@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вивчення англійської</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+body {
+    font-family: Arial;
+    background: #ffe3ef;
+    text-align: center;
+    padding: 30px 15px;
+    color: #713b55;
+}
+.container {
+    background: white;
+    max-width: 450px;
+    margin: auto;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px #d99ab755;
+}
+h1 {
+    color: #d65391;
+}
+.card {
+    background: #f9c6dc;
+    padding: 50px 10px;
+    margin: 25px 0;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 32px;
+    font-weight: bold;
+}
+input {
+    width: 90%;
+    padding: 12px;
+    border: 2px solid #edb4ce;
+    border-radius: 10px;
+    font-size: 16px;
+    text-align: center;
+}
+button {
+    background: #d65391;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin: 10px 5px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+button:hover {
+    background: #b83e79;
+}
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+.correct {
+    color: green;
+}
+.wrong {
+    color: red;
+}
+#message {
+    margin: 15px;
+    font-weight: bold;
+}
+#modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+.modal-box {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 350px;
+    width: 100%;
+}
+@media(max-width: 500px) {
+    .container {
+        padding: 15px;
+    }
+    .card {
+        padding: 40px 10px;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>🌸 English Learning 🌸</h1>
+    <p>Крок: <span id="step">1</span>/10</p>
+    <div class="card" id="card">Word</div>
+    <input type="text" id="answer" placeholder="Введіть переклад"><br>
+    <button id="check">Перевірити</button>
+    <button id="next" style="display:none">Наступне слово</button>
+    <p id="message"></p>
+    <div class="stats">
+        <div>Вірно: <b class="correct" id="correct">0</b></div>
+        <div>Невірно: <b class="wrong" id="wrong">0</b></div>
+    </div>
+</div>
+<div id="modal">
+    <div class="modal-box">
+        <h2>🌷 Результат</h2>
+        <p id="result"></p>
+        <h3 id="level"></h3>
+        <button id="restart">Почати знову</button>
+    </div>
+</div>
+<script>
+$(function() {
+    let words = [
+        {en:"Cat", ua:"кіт"},
+        {en:"Dog", ua:"собака"},
+        {en:"Family", ua:"сім'я"},
+        {en:"Pink", ua:"рожевий"},
+        {en:"Flower", ua:"квітка"},
+        {en:"Dream", ua:"мрія"},
+        {en:"Love", ua:"любов"},
+        {en:"Beautiful", ua:"гарний"},
+        {en:"White", ua:"білий"},
+        {en:"Black", ua:"чорний"}];
+    let list, step, correct, wrong, checked;
+    function start() {
+        list = [...words].sort(() => Math.random() - 0.5);
+        step = 0;
+        correct = 0;
+        wrong = 0;
+        $("#correct").text(0);
+        $("#wrong").text(0);
+        $("#modal").hide();
+        showWord();
+    }
+    function showWord() {
+        $("#card").text(list[step].en);
+        $("#step").text(step + 1);
+        $("#answer").val("").prop("disabled", false);
+        $("#message").text("");
+        $("#check").show();
+        $("#next").hide();
+        checked = false;
+    }
+    function checkAnswer() {
+        if (checked) return;
+        let answer = $("#answer").val().trim().toLowerCase();
+        if (answer === "") {
+            $("#message").text("Введіть переклад слова!");
+            return;
+        }
+        checked = true;
+        if (answer === list[step].ua.toLowerCase()) {
+            correct++;
+            $("#message").text("Правильно");
+        } else {
+            wrong++;
+            $("#message").text("Неправильно. Відповідь: " + list[step].ua);
+        }
+        $("#correct").text(correct);
+        $("#wrong").text(wrong);
+        $("#answer").prop("disabled", true);
+        $("#check").hide();
+        $("#next").show();
+    }
+    function nextWord() {
+        step++;
+        if (step < 10) {
+            showWord();
+        } else {
+            finish();
+        }
+    }
+    function finish() {
+        let percent = correct * 10;
+        let level;
+        if (percent >= 90) level = "Молодець🏆";
+        else if (percent >= 70) level = "Добре🌸";
+        else if (percent >= 50) level = "Дурбецало💗";
+        else level = "Щось ти гень не дуже";
+        $("#result").text("Правильних відповідей: " + correct + " з 10" );
+        $("#level").text(level);
+        $("#modal").css("display", "flex");
+    }
+    $("#check, #card").click(checkAnswer);
+    $("#next").click(nextWord);
+    $("#restart").click(start);
+    $("#answer").keydown(function(e) {
+        if (e.key === "Enter") checkAnswer();
+    });
+    start();
+});
+</script>
+</body>
+</html>
