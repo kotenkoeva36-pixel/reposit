@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff0f6;
+            color: #593b4d;
+            margin: 0;
+            padding: 30px 15px;
+        }
+        h1 {
+            text-align: center;
+            color: #c75b91;
+        }
+        .container {
+            max-width: 850px;
+            margin: 30px auto;
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+        }
+        .levels, .content {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px #e9bfd2;
+        }
+        .levels {
+            width: 230px;
+        }
+        .content {
+            flex: 1;
+            text-align: center;
+        }
+        h3 {
+            color: #c75b91;
+        }
+        .level {
+            display: block;
+            margin: 18px 0;
+            cursor: pointer;
+        }
+        input[type="radio"] {
+            accent-color: #d76a9e;
+        }
+        .card {
+            background: #fff0f6;
+            border-radius: 15px;
+            padding: 45px 10px;
+            margin: 20px 0;
+        }
+        #word {
+            font-size: 36px;
+            font-weight: bold;
+            color: #c75b91;
+        }
+        #answer {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid #e7b4cc;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+        #answer:focus {
+            border-color: #c75b91;
+        }
+        button {
+            background: #d979a7;
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 9px;
+            margin: 8px 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #bd5688;
+        }
+        button:disabled {
+            background: #d9c5cf;
+            cursor: not-allowed;
+        }
+        #message {
+            min-height: 22px;
+            font-weight: bold;
+        }
+        .progress {
+            height: 9px;
+            background: #f5dce8;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        #progressBar {
+            height: 100%;
+            width: 0;
+            background: #d979a7;
+            transition: width 0.3s;
+        }
+        .statistics {
+            background: #fff0f6;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .statistics p {
+            display: inline-block;
+            margin: 10px;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .wrong {
+            color: #d34e65;
+            font-weight: bold;
+        }
+        @media (max-width: 650px) {
+            .container {
+                flex-direction: column;
+            }
+            .levels, .content {
+                width: 100%;
+            }
+            #answer {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🌸 English Learning 🌸</h1>
+    <div class="container">
+        <div class="levels">
+            <h3>Рівень складності</h3>
+            <label class="level"><input type="radio" name="level" value="easy" checked>Початковий </label>
+            <label class="level"><input type="radio" name="level" value="medium">Середній</label>
+            <label class="level"><input type="radio" name="level" value="hard">Високий</label>
+        </div>
+        <div class="content">
+            <h3>Переклади слово</h3>
+            <div class="progress">
+                <div id="progressBar"></div>
+            </div>
+            <p id="number">1 / 10</p>
+            <div class="card">
+                <div id="word">always</div>
+            </div>
+            <input type="text" id="answer" placeholder="Введи переклад українською" ><br>
+            <button id="check">Перевірити</button>
+            <p id="message"></p>
+            <button id="prev">← Назад</button>
+            <button id="next">Далі →</button>
+            <div class="statistics">
+                <h3>Статистика</h3>
+                <p class="correct">Вірно: <span id="correct">0</span></p>
+                <p class="wrong"> Невірно: <span id="wrong">0</span> </p>
+            </div>
+        </div>
+    </div>
+<script>
+$(document).ready(function() {
+    const words = {
+        easy: [
+            ["always", "завжди"],
+            ["apple", "яблуко"],
+            ["friend", "друг"],
+            ["water", "вода"],
+            ["book", "книга"],
+            ["family", "сім'я"],
+            ["school", "школа"],
+            ["happy", "щасливий"],
+            ["morning", "ранок"],
+            ["beautiful", "красивий"]
+        ],
+        medium: [
+            ["journey", "подорож"],
+            ["knowledge", "знання"],
+            ["improve", "покращувати"],
+            ["weather", "погода"],
+            ["choice", "вибір"],
+            ["experience", "досвід"],
+            ["advice", "порада"],
+            ["achievement", "досягнення"],
+            ["environment", "довкілля"],
+            ["opportunity", "можливість"]
+        ],
+        hard: [
+            ["responsibility", "відповідальність"],
+            ["development", "розвиток"],
+            ["perseverance", "наполегливість"],
+            ["contemplate", "обмірковувати"],
+            ["inevitable", "неминучий"],
+            ["substantial", "значний"],
+            ["ambiguous", "неоднозначний"],
+            ["resilient", "стійкий"],
+            ["comprehensive", "всебічний"],
+            ["awareness", "усвідомлення"]
+        ]
+    };
+    let currentLevel = "easy",currentIndex = 0,correct = 0,wrong = 0,answers = {};
+
+    function showWord() {
+        let word = words[currentLevel][currentIndex];
+        $("#word").text(word[0]);
+        $("#number").text(
+            (currentIndex + 1) + " / 10"
+        );
+        $("#progressBar").css(
+            "width",
+            ((currentIndex + 1) * 10) + "%"
+        );
+        $("#answer").val("");
+        $("#message").text("");
+        if (answers[currentIndex] !== undefined) {
+            $("#answer").prop("disabled", true);
+            $("#check").prop("disabled", true);
+
+            if (answers[currentIndex]) {
+                $("#message")
+                    .text("Правильно")
+                    .css("color", "green");
+            } else {
+                $("#message")
+                    .text("Неправильно. Відповідь: " + word[1])
+                    .css("color", "red");
+            }
+        } else {
+            $("#answer").prop("disabled", false);
+            $("#check").prop("disabled", false);
+        }
+        $("#prev").prop("disabled", currentIndex === 0);
+        $("#next").prop("disabled", currentIndex === 9);
+    }
+
+    $("#check").click(function() {
+        let userAnswer = $("#answer").val().trim().toLowerCase();
+        if (userAnswer === "") {
+            $("#message")
+                .text("Введи відповідь")
+                .css("color", "red");
+            return;
+        }
+        if (answers[currentIndex] !== undefined) {
+            return;}
+        let rightAnswer = words[currentLevel][currentIndex][1];
+        if (userAnswer === rightAnswer.toLowerCase()) {
+            correct++;
+            answers[currentIndex] = true;
+            $("#message")
+                .text("Правильно")
+                .css("color", "green");
+        } else {
+            wrong++;
+            answers[currentIndex] = false;
+            $("#message")
+                .text("Неправильно. Правильна відповідь: " + rightAnswer)
+                .css("color", "red");
+        }
+        $("#correct").text(correct);
+        $("#wrong").text(wrong);
+        $("#answer").prop("disabled", true);
+        $("#check").prop("disabled", true);
+    });
+
+    $("#next").click(function() {
+        if (currentIndex < 9) {
+            currentIndex++;
+            showWord();
+        }
+    });
+
+    $("#prev").click(function() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            showWord();
+        }
+    });
+
+    $("input[name='level']").change(function() {
+        currentLevel = $(this).val();
+        currentIndex = 0;
+        correct = 0;
+        wrong = 0;
+        answers = {};
+        $("#correct").text(0);
+        $("#wrong").text(0);
+        showWord();
+    });
+    showWord();
+});
+</script>
+</body>
+</html>
