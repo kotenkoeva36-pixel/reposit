@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магічна куля</title>
+    <style>
+        body {
+            background: #080d24;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        h2 {
+            color: #e9d5ff;
+        }
+        input, button {
+            padding: 12px;
+            margin: 10px;
+            border-radius: 20px;
+            border: none;
+        }
+        button {
+            background: #c084fc;
+            cursor: pointer;
+        }
+        #ball {
+            width: 280px;
+            height: 280px;
+            max-width: 75vw;
+            max-height: 75vw;
+            margin: 25px auto;
+            border-radius: 50%;
+            background: radial-gradient(circle, #d8b4fe, #6d28d9, #080d24);
+            box-shadow: 0 0 25px violet;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 26px;
+        }
+        #message {
+            color: #f0abfc;
+        }
+        @media (max-width: 400px) {
+            #ball {
+                width: 230px;
+                height: 230px;
+            }
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            let title = document.createElement("h2");
+            title.textContent = "Магічна куля";
+            let input = document.createElement("input");
+            input.id = "question";
+            input.placeholder = "Введи запитання";
+            let ball = document.createElement("div");
+            ball.id = "ball";
+            ball.textContent = "?";
+            let button = document.createElement("button");
+            button.textContent = "Дізнатися відповідь";
+            let message = document.createElement("p");
+            message.id = "message";
+            document.body.append(title, input, ball, button, message);
+            let answers = [
+                "Так", "Ні", "Мобуть",
+                "Безумовно", "Спробуй потім",
+                "Точно ні", "Бог його знає"
+            ];
+            button.onclick = function() {
+                if (input.value.trim() === "") {
+                    message.textContent = "Введи запитання!";
+                    return;
+                }
+                let number = Math.floor(Math.random() * answers.length);
+                ball.textContent = answers[number];
+                message.textContent = "Відповідь отримано";
+            };
+        };
+    </script>
+</head>
+<body>
+</body>
+</html>
+
+
